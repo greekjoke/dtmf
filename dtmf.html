@@ -67,6 +67,7 @@
 
     if (!inst) {
       console.error('DTMF failed');
+      $('#curDev').text('ошибка / требуемый функционал не поддерживается');
     } else {
       inst.init()
         .then(() => {
@@ -80,7 +81,7 @@
         })
         .catch((err) => {
           console.error(err, 'zzz');
-          $('#curDev').text('ошибка');
+          $('#curDev').text('ошибка инициализации');
         })
         ;    
     }    

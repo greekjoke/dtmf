@@ -40,7 +40,7 @@ const DTMF = function(opt) {
   const AudioContext = window.AudioContext || window.webkitAudioContext;
   const audioElement = document.createElement("audio");
 
-  if (audioElement.setSinkId === undefined) {
+  if (audioElement.setSinkId === undefined && !USE_DEFAULT_DEVICE) {
     console.error('setSinkId not supported');
     return null;
   }
