@@ -60,31 +60,57 @@
       document.location = '?ud=' + ($(this).prop('checked') ? '1' : '0');
     });
 
-    const inst = DTMF({
-      id: 'cable',
-      devUseDefault: useDefault,
-    });
+    function createPlayer(opt) {
+      opt = opt || {};
+      const id = opt.id || "unknown";
+      const def = opt.devUseDefault;
+      const inst = DTMF(opt);
 
-    if (!inst) {
-      console.error('DTMF failed');
-      $('#curDev').text('ошибка / требуемый функционал не поддерживается');
-    } else {
+      if (!inst) {
+        console.error(`[${id}] DTMF failed`);
+        $('#curDev').text('ошибка / требуемый функционал не поддерживается');
+        return false;
+      }
+
       inst.init()
         .then(() => {
-          console.log('init success');
-          $('#curDev').text(useDefault || inst.device == null ? 'default' : inst.device.label);
+          console.log(`[${id}] init success`);
+
+          // выведем сообщение о результате
+          $('#curDev').text(def || inst.device == null ? 'default' : inst.device.label);
+
+          // настроим клавиши
           $('button.toneKey').click(function() {
             const k = $(this).data('key');
-            console.log('click', k);
+            console.log(`[${inst.id}] click: ${k}`);
             inst.play(k);
           });
+
+          // создадим дублирующий плеер, чтобы слышать что было нажато
+          if (!def) {
+            createPlayerDefault();
+          }
+
         })
         .catch((err) => {
-          console.error(err, 'zzz');
+          console.error(`[${id}] createPlayer failed: ${err}`);
           $('#curDev').text('ошибка инициализации');
-        })
-        ;    
-    }    
+        });          
+    }
+
+    function createPlayerDefault() {
+      createPlayer({ id:'default', devUseDefault:true });
+    }
+
+    function createPlayerCable() {
+      createPlayer({ id:'cable', devUseDefault:false });
+    }
+
+    if (useDefault) {
+      createPlayerDefault();
+    } else {
+      createPlayerCable();
+    }
 
   });
 </script>
